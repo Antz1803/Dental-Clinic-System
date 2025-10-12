@@ -1,0 +1,464 @@
+﻿@model DCAS.Models.PersonInfo
+
+@{
+    ViewData["Title"] = "Register Appointment";
+    var availableDays = ViewBag.AvailableDays as List<SelectListItem>;
+    var availableTimes = ViewBag.AvailableTimes as List<SelectListItem>;
+    var medicalServices = ViewBag.MedicalServices as List<SelectListItem>;
+}
+
+<style>
+    .required:after {
+        content: " *";
+        color: red;
+    }
+
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .btn {
+        background-color: #DBCACA;
+        color: #B28989;
+    }
+
+    .time-available {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .time-taken {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .card-header {
+        max-width: fit-content;
+        width: auto;
+        padding: 5px 15px;
+        background-color: #E5D9D9;
+        margin: -15px auto;
+    }
+
+        .card-header h2 {
+            margin: 0;
+            padding: 5px 0;
+            color: #B28989;
+        }
+
+    h4 {
+        color: #B28989;
+    }
+
+</style>
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div style="z-index: 9999; position: absolute; top: 0; right: 0; margin: 10px;">
+        <div id="successToast" class="toast hide bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto"><i class="fas fa-check-circle"></i> Success!</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-user-plus"></i> Patient Registration & Appointment Booking
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index" asp-controller="AppointmentRegister" method="post">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="Id" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Personal Information Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 class="border-bottom pb-2">
+                                    <i class="fas fa-user"></i> Personal Information
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Name" class="form-label required">Full Name</label>
+                                    <input asp-for="Name" class="form-control" placeholder="Enter full name" required />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="birthDate">Birth Date</label>
+                                    <input type="text" id="birthDate" asp-for="BirthDay" class="form-control" placeholder="MM/DD/YYYY" required onchange="calculateAge()" />
+                                    <span id="birthDateError" style="color:red;"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="age">Age (Calculated Automatically)</label>
+                                    <input type="text" id="age" class="form-control" readonly />
+                                    <!-- Hidden bound Age field -->
+                                    <input asp-for="Age" type="hidden" id="ageFieldHidden" />
+                                    <span asp-validation-for="Age" class="text-danger"></span>
+                                    <span id="ageError" style="color:red;"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Status" class="form-label required">Civil Status</label>
+                                    <select asp-for="Status" class="form-control" required>
+                                        <option value="">Select status</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                        <option value="Divorced">Divorced</option>
+                                        <option value="Widowed">Widowed</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="NameOfSpouse" class="form-label">Spouse Name (if applicable)</label>
+                                    <input asp-for="NameOfSpouse" class="form-control" placeholder="Enter spouse name" />
+                                    <span asp-validation-for="NameOfSpouse" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PersonalResponsibleforAccount" class="form-label required">Emergency Contact</label>
+                                    <input asp-for="PersonalResponsibleforAccount" class="form-control" placeholder="Emergency contact" maxlength="11" required />
+                                    <span asp-validation-for="PersonalResponsibleforAccount" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="HomeAddress" class="form-label required">Home Address</label>
+                                    <textarea asp-for="HomeAddress" class="form-control" rows="2" placeholder="Enter home address"></textarea>
+                                    <span asp-validation-for="HomeAddress" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label asp-for="MobileNumber" class="form-label required">Mobile Number</label>
+                                    <input asp-for="MobileNumber" class="form-control" placeholder="09XXXXXXXXX" maxlength="11" required />
+                                    <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label asp-for="HomeNumber" class="form-label">Home Number</label>
+                                    <input asp-for="HomeNumber" class="form-control" placeholder="(032) XXX-XXXX" />
+                                    <span asp-validation-for="HomeNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EmailAddress" class="form-label required">Email Address</label>
+                                    <input asp-for="EmailAddress" class="form-control" type="email" placeholder="email@example.com" required />
+                                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Occupation" class="form-label required">Occupation</label>
+                                    <input asp-for="Occupation" class="form-control" placeholder="Enter occupation" required />
+                                    <span asp-validation-for="Occupation" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Scheduling Section -->
+                        <div class="row mb-4 mt-4">
+                            <div class="col-12">
+                                <h4 class="border-bottom pb-2">
+                                    <i class="fas fa-calendar-alt"></i> Appointment Scheduling
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="AvailableDay" class="form-label required">Preferred Date</label>
+                                    <select asp-for="AvailableDay" class="form-control" id="availableDateSelect" required>
+                                        @if (availableDays != null && availableDays.Any())
+                                        {
+                                            <option value="">-- Select Date --</option>
+                                            @foreach (var day in availableDays)
+                                            {
+                                                <option value="@day.Value">@day.Text</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="">No available dates</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="AvailableDay" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="AvailableTime" class="form-label required">Preferred Time</label>
+                                    <select asp-for="AvailableTime" class="form-control" id="availableTimeSelect" required disabled>
+                                        <option value="">-- Select Time --</option>
+                                    </select>
+                                    <span asp-validation-for="AvailableTime" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Family/Emergency Contact -->
+                        <div class="row mb-4 mt-4">
+                            <div class="col-12">
+                                <h4 class="border-bottom pb-2">
+                                    <i class="fas fa-users"></i> Family & Emergency Contact
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Relationship" class="form-label">Relationship to Patient</label>
+                                    <input asp-for="Relationship" class="form-control" placeholder="e.g., Spouse, Parent, Sibling" />
+                                    <span asp-validation-for="Relationship" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ContactNumber" class="form-label">Emergency Contact Number</label>
+                                    <input asp-for="ContactNumber" class="form-control" placeholder="Emergency contact number" maxlength="11" />
+                                    <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medical Information -->
+                        <div class="row mb-4 mt-4">
+                            <div class="col-12">
+                                <h4 class="border-bottom pb-2">
+                                    <i class="fas fa-user-md"></i> Medical Information
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PhysicianCare" class="form-label">Currently Under Physician Care?</label>
+                                    <select asp-for="PhysicianCare" class="form-control">
+                                        <option value="">Select option</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <span asp-validation-for="PhysicianCare" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PhysicianName" class="form-label">Physician Name (if applicable)</label>
+                                    <input asp-for="PhysicianName" class="form-control" placeholder="Enter physician name" />
+                                    <span asp-validation-for="PhysicianName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medical Service Section -->
+                        <div class="row mb-4 mt-4">
+                            <div class="col-12">
+                                <h4 class="border-bottom pb-2">
+                                    <i class="fas fa-user-md"></i> Medical Services
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="MedicalServices" class="form-label required">Service</label>
+                                    <select asp-for="MedicalServices" class="form-control" id="medicalServiceSelect">
+                                        <option value="">-- Select a service --</option>
+                                        @foreach (var service in ViewBag.MedicalServices as List<SelectListItem> ?? new List<SelectListItem>())
+                                        {
+                                            <option value="@service.Value">@service.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="MedicalServices" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden fields for other details -->
+                        <input asp-for="Date" type="hidden" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <input asp-for="DetailOnee" type="hidden" value="N/A" />
+                        <input asp-for="DetailTwoo" type="hidden" value="N/A" />
+                        <input asp-for="OfficeAddress" type="hidden" value="N/A" />
+                        <input asp-for="DetailOne" type="hidden" value="N/A" />
+                        <input asp-for="DetailTwo" type="hidden" value="N/A" />
+                        <input asp-for="DetailThree" type="hidden" value="N/A" />
+                        <input asp-for="DetailFour" type="hidden" value="N/A" />
+                        <input asp-for="DetailFive" type="hidden" value="N/A" />
+                        <input asp-for="DetailSix" type="hidden" value="N/A" />
+                        <input asp-for="DetailSeven" type="hidden" value="N/A" />
+
+                        <!-- Submit Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-lg me-3" id="submitBtn">
+                                        <i class="fas fa-calendar-check"></i> Register & Book Appointment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateSelect = document.querySelector('select[name="AvailableDay"]');
+        const timeSelect = document.querySelector('select[name="AvailableTime"]');
+
+        if (!dateSelect || !timeSelect) {
+            console.error('Date or time select elements not found.');
+            return;
+        }
+
+        // Event listener for when a date is selected
+        dateSelect.addEventListener('change', function() {
+            const selectedDate = this.value;
+            console.log("Selected date:", selectedDate);
+
+            // Clear previous options
+            timeSelect.innerHTML = '<option value="">-- Select Time --</option>';
+
+            if (!selectedDate) {
+                timeSelect.disabled = true;
+                return;
+            }
+
+            timeSelect.disabled = false;
+                
+            // Fetch available times
+            fetch(`/AppointmentRegister/GetAvailableTimes?selectedDate=${encodeURIComponent(selectedDate)}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Available times data:", data);
+                    data.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.value;
+                        opt.textContent = item.text;
+                        timeSelect.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error fetching times:", err);
+                    alert("Error fetching available times.");
+                });
+        });
+
+        timeSelect.disabled = true;
+    });
+        
+    // Initialize flatpickr for birth date
+    flatpickr("#birthDate", {
+        dateFormat: "m-d-Y",
+        onChange: function() {
+            calculateAge();
+        }
+    });
+
+    function calculateAge() {
+        const birthDate = document.getElementById('birthDate').value;
+        const ageFieldHidden = document.getElementById('ageFieldHidden');
+        const birthDateError = document.getElementById('birthDateError');
+        const ageError = document.getElementById('ageError');
+
+        birthDateError.textContent = '';
+        ageError.textContent = '';
+
+        if (birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+
+            if (isNaN(birth.getTime())) {
+                birthDateError.textContent = 'Invalid birth date format.';
+                return;
+            }
+
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+
+            ageFieldHidden.value = age;
+            document.getElementById('age').value = age;
+        } else {
+            ageFieldHidden.value = '';
+            document.getElementById('age').value = '';
+        }
+    }
+       const successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+    if (successMessage) {
+        // Put the message into the toast body
+        const toastBody = document.querySelector('#successToast .toast-body');
+        if (toastBody) {
+            toastBody.textContent = successMessage;
+        }
+
+        // Get the toast element
+        const successToastEl = document.getElementById('successToast');
+        if (successToastEl) {
+
+            const toast = new bootstrap.Toast(successToastEl, {
+                autohide: true,
+                delay: 5000
+            });
+            toast.show();
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
