@@ -198,7 +198,7 @@ namespace DCAS.Controllers
 
             // Escape values to prevent HTML/JS injection
             var html = $@"
-<form id='editForm' enctype='multipart/form-data'>
+<form id='editForm' method='post' enctype='multipart/form-data' action='{Url.Action("EditModal", "MedicineInventories")}'>
     <input type='hidden' name='Id' value='{medicine.Id}' />
 
     <div class='mb-3 text-center'>
@@ -243,56 +243,42 @@ namespace DCAS.Controllers
 
         // Save edits from modal
         [HttpPost]
-        public async Task<IActionResult> EditModal(int Id, string MedicineName, decimal Price,
-     int Quantity, string Miligram, string Description, DateTime ExpiryDate, IFormFile Image)
+        public async Task<IActionResult> EditModal(MedicineInventory model, IFormFile Image)
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine($"=== EditModal Called ===");
-                System.Diagnostics.Debug.WriteLine($"Id: {Id}");
-                System.Diagnostics.Debug.WriteLine($"MedicineName: {MedicineName}");
-                System.Diagnostics.Debug.WriteLine($"Price: {Price}");
-                System.Diagnostics.Debug.WriteLine($"Quantity: {Quantity}");
-
-                var existing = await _context.MedicineInventory.FindAsync(Id);
+                var existing = await _context.MedicineInventory.FindAsync(model.Id);
                 if (existing == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("Medicine not found!");
-                    return Json(new { success = false, message = "Medicine not found" });
+                    return RedirectToAction("Index");
                 }
 
-                System.Diagnostics.Debug.WriteLine("Found medicine, updating...");
+                // Update fields
+                existing.MedicineName = model.MedicineName;
+                existing.Price = model.Price;
+                existing.Quantity = model.Quantity;
+                existing.Miligram = model.Miligram;
+                existing.Description = model.Description;
+                existing.ExpiryDate = model.ExpiryDate;
 
-                existing.MedicineName = MedicineName;
-                existing.Price = Price;
-                existing.Quantity = Quantity;
-                existing.Miligram = Miligram;
-                existing.Description = Description;
-                existing.ExpiryDate = ExpiryDate;
-
+                // Replace image if new one uploaded
                 if (Image != null && Image.Length > 0)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Processing new image: {Image.Length} bytes");
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await Image.CopyToAsync(memoryStream);
-                        existing.Image = memoryStream.ToArray();
-                    }
+                    using var memoryStream = new MemoryStream();
+                    await Image.CopyToAsync(memoryStream);
+                    existing.Image = memoryStream.ToArray();
                 }
 
                 _context.Update(existing);
-                var result = await _context.SaveChangesAsync();
-                System.Diagnostics.Debug.WriteLine($"SaveChangesAsync result: {result} rows affected");
+                await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Updated successfully" });
+                // Go back to Index directly
+                return RedirectToAction("Index");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                System.Diagnostics.Debug.WriteLine($"=== ERROR ===");
-                System.Diagnostics.Debug.WriteLine($"Message: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Inner: {ex.InnerException?.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack: {ex.StackTrace}");
-                return Json(new { success = false, message = ex.Message });
+                // If error, still go back (or show an error view if you want)
+                return RedirectToAction("Index");
             }
         }
 

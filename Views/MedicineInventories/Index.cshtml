@@ -308,54 +308,38 @@
         }
     }
 
-    // Handle form submission
+       // Handle Edit form submission (AJAX)
     $(document).on('submit', '#editForm', function (e) {
         e.preventDefault();
 
-        console.log('Form submitted!');
+        var formData = new FormData(this);
 
-        var form = $('#editForm')[0];
-        var formData = new FormData(form);
-
-        // Debug: log all form data
-        console.log('=== Form Data ===');
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-
-        // Show loading state
         var submitBtn = $(this).find('button[type="submit"]');
         var originalText = submitBtn.html();
         submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
 
         $.ajax({
-            url: '@Url.Action("EditModal", "MedicineInventories")',
+            url: '/MedicineInventories/EditModal',
             type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function (response) {
-                console.log('Response received:', response);
-
-                if (response.success) {
-                    console.log('Success! Reloading page...');
-                    $('#editModal').modal('hide');
-                    location.reload();
+            success: function (res) {
+                if (res.success) {
+               
+                    window.location.href = '/MedicineInventories/Index';
                 } else {
-                    console.error('Save failed:', response.message);
-                    alert('Failed to save: ' + (response.message || 'Unknown error'));
-                    submitBtn.prop('disabled', false).html(originalText);
+                    alert(res.message);
                 }
             },
-            error: function (xhr, status, error) {
-                console.error('=== AJAX Error ===');
-                console.error('Status:', status);
-                console.error('Error:', error);
-                console.error('Response:', xhr.responseText);
-
-                alert('Error saving changes. Check console for details.');
+            error: function () {
+                alert("An error occurred.");
+            },
+            complete: function () {
                 submitBtn.prop('disabled', false).html(originalText);
             }
         });
     });
+
+
 </script>
