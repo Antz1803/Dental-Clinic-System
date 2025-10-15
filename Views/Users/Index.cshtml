@@ -86,7 +86,7 @@
                        data-birthdate="@item.BirthDate.ToString("yyyy-MM-dd")"
                        data-startdate="@item.StartDate.ToString("yyyy-MM-dd")"
                        data-username="@item.Username">Details</a>
-                    <a href="#" class="btn btn-sm btn-outline-danger delete-link" data-id="@item.UsersId" data-name="@item.Name">Delete</a>
+                            <a href="#" class="btn btn-sm btn-outline-danger delete-link" data-id="@item.UsersId" data-name="@item.Name">Delete</a>
                 </div>
             </div>
         </div>
@@ -155,8 +155,6 @@
 
                             <div class="tab-pane fade" id="address">
                                 <p><strong>Address:</strong> <span id="modal-address"></span></p>
-                                <p><strong>City:</strong> <span id="modal-city"></span></p>
-                                <p><strong>Postal Code:</strong> <span id="modal-postalcode"></span></p>
                             </div>
 
                             <div class="tab-pane fade" id="schedule">
@@ -181,6 +179,29 @@
 </div>
 </div>
 </div>
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the user **<span id="deleteUserName" class="text-danger"></span>**? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteUserId" name="id" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -229,16 +250,19 @@
         });
 
           // JavaScript for the Delete Confirmation Modal
-            $('.delete-link').on('click', function (e) {
-                e.preventDefault();
-                var userId = $(this).data('id');
-                var userName = $(this).data('name');
+         
+                $('.delete-link').on('click', function (e) {
+            e.preventDefault();
+            var userId = $(this).data('id');
+            var userName = $(this).data('name');
 
-                $('#deleteUserId').val(userId);
-                $('#deleteUserName').text(userName);
+            // Set the hidden input field 'id' for the POST request
+            $('#deleteUserId').val(userId);
+            // Set the user name in the modal body for confirmation
+            $('#deleteUserName').text(userName);
 
-                $('#deleteConfirmationModal').modal('show');
-            });
-        
+            // Show the modal
+            $('#deleteConfirmationModal').modal('show');
+        });
     </script>
 }

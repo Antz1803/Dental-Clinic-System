@@ -196,40 +196,41 @@ namespace DCAS.Controllers
             var medicine = await _context.MedicineInventory.FindAsync(id);
             if (medicine == null) return NotFound();
 
+            // Escape values to prevent HTML/JS injection
             var html = $@"
 <form id='editForm' enctype='multipart/form-data'>
     <input type='hidden' name='Id' value='{medicine.Id}' />
 
     <div class='mb-3 text-center'>
         {(medicine.Image != null && medicine.Image.Length > 0
-                ? $"<img src='{Url.Action("GetImage", "MedicineInventories", new { id = medicine.Id })}' class='img-fluid rounded mb-2' style='max-height:200px;' />"
-                : "<div class='text-muted mb-2'><i class='fas fa-image fa-3x'></i><p>No image</p></div>")}
+                    ? $"<img src='{Url.Action("GetImage", "MedicineInventories", new { id = medicine.Id })}' class='img-fluid rounded mb-2' style='max-height:200px;' />"
+                    : "<div class='text-muted mb-2'><i class='fas fa-image fa-3x'></i><p>No image</p></div>")}
         <input type='file' class='form-control' name='Image' accept='image/*' />
     </div>
 
     <div class='mb-3'>
         <label class='form-label'>Medicine Name</label>
-        <input type='text' class='form-control' name='MedicineName' value='{medicine.MedicineName}' />
+        <input type='text' class='form-control' name='MedicineName' value='{System.Security.SecurityElement.Escape(medicine.MedicineName)}' required />
     </div>
     <div class='mb-3'>
         <label class='form-label'>Price</label>
-        <input type='number' step='0.01' class='form-control' name='Price' value='{medicine.Price}' />
+        <input type='number' step='0.01' class='form-control' name='Price' value='{medicine.Price}' required />
     </div>
     <div class='mb-3'>
         <label class='form-label'>Quantity</label>
-        <input type='number' class='form-control' name='Quantity' value='{medicine.Quantity}' />
+        <input type='number' class='form-control' name='Quantity' value='{medicine.Quantity}' required />
     </div>
     <div class='mb-3'>
         <label class='form-label'>Strength</label>
-        <input type='text' class='form-control' name='Miligram' value='{medicine.Miligram}' />
+        <input type='text' class='form-control' name='Miligram' value='{System.Security.SecurityElement.Escape(medicine.Miligram ?? "")}' />
     </div>
     <div class='mb-3'>
         <label class='form-label'>Description</label>
-        <textarea class='form-control' name='Description'>{medicine.Description}</textarea>
+        <textarea class='form-control' name='Description' rows='3'>{System.Security.SecurityElement.Escape(medicine.Description ?? "")}</textarea>
     </div>
     <div class='mb-3'>
         <label class='form-label'>Expiry Date</label>
-        <input type='date' class='form-control' name='ExpiryDate' value='{medicine.ExpiryDate:yyyy-MM-dd}' />
+        <input type='date' class='form-control' name='ExpiryDate' value='{medicine.ExpiryDate:yyyy-MM-dd}' required />
     </div>
 
     <button type='submit' class='btn btn-primary'>
@@ -242,23 +243,36 @@ namespace DCAS.Controllers
 
         // Save edits from modal
         [HttpPost]
-        public async Task<IActionResult> EditModal(MedicineInventory medicineInventory, IFormFile Image)
+        public async Task<IActionResult> EditModal(int Id, string MedicineName, decimal Price,
+     int Quantity, string Miligram, string Description, DateTime ExpiryDate, IFormFile Image)
         {
             try
             {
-                var existing = await _context.MedicineInventory.FindAsync(medicineInventory.Id);
-                if (existing == null)
-                    return Json(new { success = false });
+                System.Diagnostics.Debug.WriteLine($"=== EditModal Called ===");
+                System.Diagnostics.Debug.WriteLine($"Id: {Id}");
+                System.Diagnostics.Debug.WriteLine($"MedicineName: {MedicineName}");
+                System.Diagnostics.Debug.WriteLine($"Price: {Price}");
+                System.Diagnostics.Debug.WriteLine($"Quantity: {Quantity}");
 
-                existing.MedicineName = medicineInventory.MedicineName;
-                existing.Price = medicineInventory.Price;
-                existing.Quantity = medicineInventory.Quantity;
-                existing.Miligram = medicineInventory.Miligram;
-                existing.Description = medicineInventory.Description;
-                existing.ExpiryDate = medicineInventory.ExpiryDate;
+                var existing = await _context.MedicineInventory.FindAsync(Id);
+                if (existing == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Medicine not found!");
+                    return Json(new { success = false, message = "Medicine not found" });
+                }
+
+                System.Diagnostics.Debug.WriteLine("Found medicine, updating...");
+
+                existing.MedicineName = MedicineName;
+                existing.Price = Price;
+                existing.Quantity = Quantity;
+                existing.Miligram = Miligram;
+                existing.Description = Description;
+                existing.ExpiryDate = ExpiryDate;
 
                 if (Image != null && Image.Length > 0)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Processing new image: {Image.Length} bytes");
                     using (var memoryStream = new MemoryStream())
                     {
                         await Image.CopyToAsync(memoryStream);
@@ -266,12 +280,19 @@ namespace DCAS.Controllers
                     }
                 }
 
-                await _context.SaveChangesAsync();
-                return Json(new { success = true });
+                _context.Update(existing);
+                var result = await _context.SaveChangesAsync();
+                System.Diagnostics.Debug.WriteLine($"SaveChangesAsync result: {result} rows affected");
+
+                return Json(new { success = true, message = "Updated successfully" });
             }
-            catch
+            catch (Exception ex)
             {
-                return Json(new { success = false });
+                System.Diagnostics.Debug.WriteLine($"=== ERROR ===");
+                System.Diagnostics.Debug.WriteLine($"Message: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Inner: {ex.InnerException?.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack: {ex.StackTrace}");
+                return Json(new { success = false, message = ex.Message });
             }
         }
 

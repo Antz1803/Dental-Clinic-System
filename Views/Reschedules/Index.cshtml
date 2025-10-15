@@ -225,15 +225,15 @@
                 <div class="col-md-6"><strong>Available Time:</strong> <span id="detailAvailableTime"></span></div>
 
                 <!-- Extra Detail Fields -->
-                <div class="col-md-6"><strong>How do you preferred to be addressed:</strong> <span id="detailDetailOnee"></span></div>
-                <div class="col-md-6"><strong>Whom we may thank for referring you to our clinic:</strong> <span id="detailDetailTwoo"></span></div>
-                <div class="col-md-6"><strong>Do you have symptoms:</strong> <span id="detailDetailOne"></span></div>
-                <div class="col-md-6"><strong>Are taking any medication, vitamins or supplements?:</strong> <span id="detailDetailTwo"></span></div>
-                <div class="col-md-6"><strong>For what purpose:</strong> <span id="detailDetailThree"></span></div>
-                <div class="col-md-6"><strong>Are you allergic or sensitive to any food, drug or medications?:</strong> <span id="detailDetailFour"></span></div>
-                <div class="col-md-6"><strong>For wowen Only: Are you pregnant?:</strong> <span id="detailDetailFive"></span></div>
-                <div class="col-md-6"><strong>Expected Date of Delivery:</strong> <span id="detailDetailSix"></span></div>
-                <div class="col-md-6"><strong>Do you have any problems associated with your menstrual period?:</strong> <span id="detailDetailSeven"></span></div>
+                <div class="col-md-6"><strong>How do you preferred to be addressed: </strong> <span id="detailDetailOnee"></span></div>
+                <div class="col-md-6"><strong>Whom we may thank for referring you to our clinic: </strong> <span id="detailDetailTwoo"></span></div>
+                <div class="col-md-6"><strong>Do you have symptoms: </strong> <span id="detailDetailOne"></span></div>
+                <div class="col-md-6"><strong>Are taking any medication, vitamins or supplements?: </strong> <span id="detailDetailTwo"></span></div>
+                <div class="col-md-6"><strong>For what purpose: </strong> <span id="detailDetailThree"></span></div>
+                <div class="col-md-6"><strong>Are you allergic or sensitive to any food, drug or medications?: </strong> <span id="detailDetailFour"></span></div>
+                <div class="col-md-6"><strong>For wowen Only: Are you pregnant?: </strong> <span id="detailDetailFive"></span></div>
+                <div class="col-md-6"><strong>Expected Date of Delivery: </strong> <span id="detailDetailSix"></span></div>
+                <div class="col-md-6"><strong>Do you have any problems associated with your menstrual period?: </strong> <span id="detailDetailSeven"></span></div>
             </div>
 
             <div class="modal-footer">
@@ -255,39 +255,39 @@
                     <input type="hidden" id="DetailsId" name="Id" />
 
                     <div class="col-md-6">
-                        <label for="DetailOnee" class="form-label">DetailOnee</label>
+                        <label for="DetailOnee" class="form-label">How do you preferred to be addressed: </label>
                         <input type="text" class="form-control" id="DetailOnee" name="DetailOnee" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailTwoo" class="form-label">DetailTwoo</label>
+                        <label for="DetailTwoo" class="form-label">Whom we may thank for referring you to our clinic: </label>
                         <input type="text" class="form-control" id="DetailTwoo" name="DetailTwoo" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailOne" class="form-label">DetailOne</label>
+                        <label for="DetailOne" class="form-label">Do you have symptoms: </label>
                         <input type="text" class="form-control" id="DetailOne" name="DetailOne" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailTwo" class="form-label">DetailTwo</label>
+                        <label for="DetailTwo" class="form-label">Are taking any medication, vitamins or supplements?: </label>
                         <input type="text" class="form-control" id="DetailTwo" name="DetailTwo" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailThree" class="form-label">DetailThree</label>
+                        <label for="DetailThree" class="form-label">For what purpose: </label>
                         <input type="text" class="form-control" id="DetailThree" name="DetailThree" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailFour" class="form-label">DetailFour</label>
+                        <label for="DetailFour" class="form-label">Are you allergic or sensitive to any food, drug or medications?: </label>
                         <input type="text" class="form-control" id="DetailFour" name="DetailFour" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailFive" class="form-label">DetailFive</label>
+                        <label for="DetailFive" class="form-label">For wowen Only: Are you pregnant?: </label>
                         <input type="text" class="form-control" id="DetailFive" name="DetailFive" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailSix" class="form-label">DetailSix</label>
+                        <label for="DetailSix" class="form-label">Expected Date of Delivery: </label>
                         <input type="text" class="form-control" id="DetailSix" name="DetailSix" />
                     </div>
                     <div class="col-md-6">
-                        <label for="DetailSeven" class="form-label">DetailSeven</label>
+                        <label for="DetailSeven" class="form-label">Do you have any problems associated with your menstrual period?: </label>
                         <input type="text" class="form-control" id="DetailSeven" name="DetailSeven" />
                     </div>
                 </div>
@@ -335,7 +335,7 @@
         </div>
     </div>
 </div>
-<!-- Bootstrap 5 JS (include before closing body tag) -->
+<!-- Bootstrap 5 JS (before closing body tag) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- jQuery (if not already included) -->
@@ -344,16 +344,18 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Update Modal functionality
+
+            // ======================
+            // UPDATE MODAL
+            // ======================
             $(".open-update-modal").click(function () {
                 var id = $(this).data("id");
 
-               $.ajax({
+                $.ajax({
                     url: '@Url.Action("GetById", "Reschedules")',
                     type: 'GET',
                     data: { id: id },
                     success: function (data) {
-                        // Use || '' for all detail fields to prevent errors
                         $("#DetailsId").val(data.id || '');
                         $("#DetailOnee").val(data.detailOnee || '');
                         $("#DetailTwoo").val(data.detailTwoo || '');
@@ -366,37 +368,39 @@
                         $("#DetailSeven").val(data.detailSeven || '');
                         $("#DetailEigth").val(data.detailEigth || '');
 
-                        $("#detailsModal").modal('hide');
-                        $("#updateDetailsModal").modal('show');
+                        var updateModal = new bootstrap.Modal(document.getElementById("updateDetailsModal"));
+                        updateModal.show();
                     },
                     error: function (xhr, status, error) {
-                         console.error("AJAX Error loading details for update:", status, error, xhr.responseText);
-                         alert("Error loading details for update.");
+                        console.error("AJAX Error:", status, error, xhr.responseText);
+                        alert("Error loading details for update.");
                     }
                 });
             });
 
-        // Save updated details
-        $("#updateDetailsForm").submit(function (e) {
-            e.preventDefault();
+            // Save updated details
+            $("#updateDetailsForm").submit(function (e) {
+                e.preventDefault();
+                var formData = $(this).serialize();
 
-            var formData = $(this).serialize();
-
-            $.ajax({
-                url: '@Url.Action("UpdateDetails", "Reschedules")',
-                type: 'POST',
-                data: formData,
-                success: function () {
-                    $("#updateDetailsModal").modal('hide');
-                    location.reload();
-                },
-                error: function () {
-                    alert("Error saving details.");
-                }
+                $.ajax({
+                    url: '@Url.Action("UpdateDetails", "Reschedules")',
+                    type: 'POST',
+                    data: formData,
+                    success: function () {
+                        var updateModal = bootstrap.Modal.getInstance(document.getElementById("updateDetailsModal"));
+                        updateModal.hide();
+                        location.reload();
+                    },
+                    error: function () {
+                        alert("Error saving details.");
+                    }
+                });
             });
-        });
 
-            // Details Modal functionality
+            // ======================
+            // DETAILS MODAL
+            // ======================
             $(".open-details-modal").click(function () {
                 var id = $(this).data("id");
 
@@ -404,46 +408,49 @@
                     url: '@Url.Action("GetById", "Reschedules")',
                     type: 'GET',
                     data: { id: id },
-                          success: function (data) {
-            $("#detailName").text(data.name);
-            $("#detailHomeAddress").text(data.homeAddress);
-            $("#detailDate").text(data.date);
-                  if (data.birthDay) {
-            let birthDate = new Date(data.birthDay);
-            let formatted = (birthDate.getMonth() + 1).toString().padStart(2, '0') + "-" +
-                            birthDate.getDate().toString().padStart(2, '0') + "-" +
-                            birthDate.getFullYear();
-            $("#detailBirthDay").text(formatted);
-        }
-            $("#detailAge").text(data.age);
-            $("#detailHomeNumber").text(data.homeNumber);
-            $("#detailOccupation").text(data.occupation);
-            $("#detailMobileNumber").text(data.mobileNumber);
-            $("#detailOfficeAddress").text(data.officeAddress);
-            $("#detailEmailAddress").text(data.emailAddress);
-            $("#detailStatus").text(data.status);
-            $("#detailNameOfSpouse").text(data.nameOfSpouse);
-            $("#detailPersonalResponsibleforAccount").text(data.personalResponsibleforAccount);
-            $("#detailRelationship").text(data.relationship);
-            $("#detailPhysicianCare").text(data.physicianCare);
-            $("#detailPhysicianName").text(data.physicianName);
-            $("#detailContactNumber").text(data.contactNumber);
-            $("#detailAvailableDay").text(data.availableDay);
-            $("#detailAvailableTime").text(data.availableTime);
+                    success: function (data) {
+                        $("#detailName").text(data.name);
+                        $("#detailHomeAddress").text(data.homeAddress);
+                        $("#detailDate").text(data.date);
 
-            // Extra fields
-            $("#detailDetailOnee").text(data.detailOnee);
-            $("#detailDetailTwoo").text(data.detailTwoo);
-            $("#detailDetailOne").text(data.detailOne);
-            $("#detailDetailTwo").text(data.detailTwo);
-            $("#detailDetailThree").text(data.detailThree);
-            $("#detailDetailFour").text(data.detailFour);
-            $("#detailDetailFive").text(data.detailFive);
-            $("#detailDetailSix").text(data.detailSix);
-            $("#detailDetailSeven").text(data.detailSeven);
-            $("#detailDetailEigth").text(data.detailEigth);
+                        if (data.birthDay) {
+                            let birthDate = new Date(data.birthDay);
+                            let formatted = (birthDate.getMonth() + 1).toString().padStart(2, '0') + "-" +
+                                            birthDate.getDate().toString().padStart(2, '0') + "-" +
+                                            birthDate.getFullYear();
+                            $("#detailBirthDay").text(formatted);
+                        }
 
-            $("#detailsModal").modal("show");
+                        $("#detailAge").text(data.age);
+                        $("#detailHomeNumber").text(data.homeNumber);
+                        $("#detailOccupation").text(data.occupation);
+                        $("#detailMobileNumber").text(data.mobileNumber);
+                        $("#detailOfficeAddress").text(data.officeAddress);
+                        $("#detailEmailAddress").text(data.emailAddress);
+                        $("#detailStatus").text(data.status);
+                        $("#detailNameOfSpouse").text(data.nameOfSpouse);
+                        $("#detailPersonalResponsibleforAccount").text(data.personalResponsibleforAccount);
+                        $("#detailRelationship").text(data.relationship);
+                        $("#detailPhysicianCare").text(data.physicianCare);
+                        $("#detailPhysicianName").text(data.physicianName);
+                        $("#detailContactNumber").text(data.contactNumber);
+                        $("#detailAvailableDay").text(data.availableDay);
+                        $("#detailAvailableTime").text(data.availableTime);
+
+                        // Extra detail fields
+                        $("#detailDetailOnee").text(data.detailOnee);
+                        $("#detailDetailTwoo").text(data.detailTwoo);
+                        $("#detailDetailOne").text(data.detailOne);
+                        $("#detailDetailTwo").text(data.detailTwo);
+                        $("#detailDetailThree").text(data.detailThree);
+                        $("#detailDetailFour").text(data.detailFour);
+                        $("#detailDetailFive").text(data.detailFive);
+                        $("#detailDetailSix").text(data.detailSix);
+                        $("#detailDetailSeven").text(data.detailSeven);
+                        $("#detailDetailEigth").text(data.detailEigth);
+
+                        var detailsModal = new bootstrap.Modal(document.getElementById("detailsModal"));
+                        detailsModal.show();
                     },
                     error: function () {
                         alert("Error loading details.");
@@ -451,49 +458,33 @@
                 });
             });
 
-            // RESCHEDULE MODAL FUNCTIONALITY 
+            // ======================
+            // RESCHEDULE MODAL
+            // ======================
             $(".reschedule-btn").click(function (e) {
                 e.preventDefault();
-                console.log("Reschedule button clicked!"); 
 
                 var personId = $(this).data("id");
                 var personName = $(this).closest('tr').find('td:first').text();
 
-                console.log("Person ID:", personId); 
-                console.log("Person Name:", personName); 
-
-                // Set person info in modal
                 $("#reschedulePersonId").val(personId);
                 $("#reschedulePersonName").text(personName);
 
-                // Clear previous selections
                 $("#availableDate").empty().append('<option value="">Select date...</option>');
                 $("#availableTime").empty().append('<option value="">Select time...</option>').prop('disabled', true);
 
-                // Load available dates
                 loadAvailableDates();
 
-                // Show the modal
-                $("#rescheduleModal").modal('show');
+                var resModal = new bootstrap.Modal(document.getElementById("rescheduleModal"));
+                resModal.show();
             });
 
-            // Load available dates function - MOVED INSIDE document.ready
             function loadAvailableDates() {
-                console.log("Loading available dates...");
-
                 $.ajax({
                     url: '@Url.Action("GetAvailableDates", "Reschedules")',
                     type: 'GET',
                     success: function (data) {
-                        console.log("Available dates response:", data); 
-
-                        if (data.error) {
-                            alert("Error loading available dates: " + data.error);
-                            return;
-                        }
-
                         $("#availableDate").empty().append('<option value="">Select date...</option>');
-
                         $.each(data, function (index, item) {
                             $("#availableDate").append(
                                 '<option value="' + item.value + '">' +
@@ -502,13 +493,13 @@
                         });
                     },
                     error: function (xhr, status, error) {
-                        console.error("AJAX Error:", error); 
-                        alert("Error loading available dates: " + error);
+                        console.error("AJAX Error:", error);
+                        alert("Error loading available dates.");
                     }
                 });
             }
 
-            // When date is selected, load available time slots
+            // When date is selected, load time slots
             $("#availableDate").change(function () {
                 var selectedDate = $(this).val();
 
@@ -517,17 +508,11 @@
                     return;
                 }
 
-                // Load available time slots for selected date
                 $.ajax({
                     url: '@Url.Action("GetAvailableTimeSlots", "Reschedules")',
                     type: 'GET',
                     data: { date: selectedDate },
                     success: function (data) {
-                        if (data.error) {
-                            alert("Error loading available times: " + data.error);
-                            return;
-                        }
-
                         $("#availableTime").empty().append('<option value="">Select time...</option>');
 
                         if (data.length === 0) {
@@ -549,7 +534,7 @@
                 });
             });
 
-            // Handle reschedule confirmation
+            // Confirm reschedule
             $("#confirmReschedule").click(function () {
                 var personId = $("#reschedulePersonId").val();
                 var selectedDate = $("#availableDate").val();
@@ -560,7 +545,6 @@
                     return;
                 }
 
-                // Disable button to prevent double-clicking
                 $(this).prop('disabled', true).text('Rescheduling...');
 
                 $.ajax({
@@ -574,7 +558,8 @@
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
-                            $("#rescheduleModal").modal('hide');
+                            var resModal = bootstrap.Modal.getInstance(document.getElementById("rescheduleModal"));
+                            resModal.hide();
                             location.reload();
                         } else {
                             alert("Reschedule failed: " + response.message);
@@ -584,13 +569,12 @@
                         alert("Error occurred while rescheduling appointment.");
                     },
                     complete: function () {
-                        // Re-enable button
                         $("#confirmReschedule").prop('disabled', false).text('Reschedule');
                     }
-                }); 
+                });
             });
 
-            // Reset modal when hidden
+            // Reset reschedule modal
             $('#rescheduleModal').on('hidden.bs.modal', function () {
                 $("#reschedulePersonId").val('');
                 $("#reschedulePersonName").text('');
@@ -598,6 +582,8 @@
                 $("#availableTime").empty().append('<option value="">Select time...</option>').prop('disabled', true);
                 $("#confirmReschedule").prop('disabled', false).text('Reschedule');
             });
+
         });
     </script>
 }
+

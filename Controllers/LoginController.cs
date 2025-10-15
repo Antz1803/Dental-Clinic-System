@@ -84,7 +84,7 @@ namespace DCAS.Controllers
                 // Generate claims
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.Name, user.Username),
                     new Claim(ClaimTypes.Role, user.Role),
                     new Claim("UsersId", user.UsersId.ToString())
                 };

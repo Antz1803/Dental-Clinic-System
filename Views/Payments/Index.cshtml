@@ -67,6 +67,7 @@
             font-size: 0.8rem;
         }
 
+
     </style>
     <div class="card">
         <div class="card-header text-black">
@@ -75,7 +76,7 @@
             </h2>
         </div>
 
-        <div class="m-5"
+        <div class="m-5">
         <div class="row">
             @foreach (var item in Model)
             {
@@ -105,7 +106,7 @@
                                     <i class="fas fa-peso-sign"></i> Pay
                                 </a>
                                 <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@item.PaymentId">
-                                    <i class="fas fa-trash"></i> Delete
+                                    <i class="fas fa-trash"></i> Cancel
                                 </a>
                             </div>
                         </div>

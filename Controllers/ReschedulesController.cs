@@ -178,7 +178,7 @@ namespace DCAS.Controllers
 
                 // Update PersonInfo with new date and time
                 person.Date = newDate;
-                person.AvailableTime = DateTime.Today.Add(newTime).ToString("h:mm tt"); // Format as readable time
+                person.AvailableTime = DateTime.Today.Add(newTime).ToString("HH:mm:ss"); // Format as readable time
                 // Update AvailableDay with the date in dd/MM/yyyy format:
                 person.AvailableDay = newDate.ToString("dd/MM/yyyy"); // e.g., "01/08/2025"
 
@@ -191,7 +191,7 @@ namespace DCAS.Controllers
                 return Json(new
                 {
                     success = true,
-                    message = $"Appointment rescheduled successfully for {newDate.ToString("MMMM dd, yyyy")} at {DateTime.Today.Add(newTime).ToString("h:mm tt")}"
+                    message = $"Appointment rescheduled successfully for {newDate.ToString("MMMM dd, yyyy")} at {DateTime.Today.Add(newTime).ToString("HH:mm:ss")}"
                 });
             }
             catch (Exception ex)

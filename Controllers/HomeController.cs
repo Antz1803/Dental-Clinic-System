@@ -181,25 +181,31 @@ MedicineName       NVARCHAR(max) not null,
             return View();
         }
 
+
+
         [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Profile()
         {
-            // Get the current user's username from the claims
-            var username = User.FindFirst(ClaimTypes.Name)?.Value;
+            // 1. Get the current user's username from the claims.
+            var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
 
             if (string.IsNullOrEmpty(username))
             {
-                return NotFound(); // No user found in claims
+                return Forbid();
             }
 
-            // Find the user in the database using the username
-            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            // 2. Find the user in the database using the Username (case-insensitive fix).
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
 
             if (currentUser == null)
             {
-                return NotFound(); // User not found in the database
+                // If the user's username is in the claim but not the database.
+                return NotFound();
             }
 
+            // 3. Return the view with the user data.
+            // This tells ASP.NET to look for Views/Home/Profile.cshtml
             return View("Profile", currentUser);
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
