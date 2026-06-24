@@ -47,8 +47,8 @@ namespace DCAS.Controllers
 
                 var adminUser = new Users
                 {
-                    Username = "admin",
-                    Password = BCrypt.Net.BCrypt.HashPassword("admin123", workFactor: 10),
+                    Username = "Test143",
+                    Password = BCrypt.Net.BCrypt.HashPassword("Test143", workFactor: 10),
                     Profile = profileData, // Assign the converted byte array
                     Name = "Administrator",
                     Role = "Admin",
@@ -62,8 +62,8 @@ namespace DCAS.Controllers
                     Position = "Administrator",
                     WorkStatus = "Active",
                     Age = "40",
-                    BirthDate = DateTime.Parse("1985-01-01"),
-                    StartDate = DateTime.Now,
+                    BirthDate = DateTime.SpecifyKind(DateTime.Parse("1985-01-01"), DateTimeKind.Utc),
+                    StartDate = DateTime.UtcNow,
                 };
                 _context.Users.Add(adminUser);
                 await _context.SaveChangesAsync();
