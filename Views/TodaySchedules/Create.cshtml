@@ -1,0 +1,200 @@
+﻿@model DCAS.Models.TodaySchedule
+@{
+    ViewData["Title"] = "Create Schedule";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar-plus"></i> Create New Schedule
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" id="scheduleForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EventDate" class="form-label">
+                                        <i class="text-ni fas fa-calendar"></i> Event Date
+                                    </label>
+                                    <input asp-for="EventDate" class="form-control" type="date" id="eventDate" />
+                                    <span asp-validation-for="EventDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EventTime" class="form-label">
+                                        <i class="text-ni fas fa-clock"></i> Event Time
+                                    </label>
+                                    <input asp-for="EventTime" class="form-control" type="time" id="eventTime" />
+                                    <span asp-validation-for="EventTime" class="text-danger"></span>
+                                    <small class="form-text text-muted">Choose from available time slots</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <input asp-for="PersonName" class="form-control" type="hidden" />
+                        </div>
+
+                        <div id="conflictWarning" class="alert alert-warning d-none" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Time Conflict!</strong> This time slot is already taken. Please verify before submitting.
+                        </div>
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-button btn-lg me-2">
+                                <i class="fas fa-save"></i> Create Schedule
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back to Schedule
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Time Slots Helper -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock"></i> Quick Time Selection
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Click on a time slot to quickly select it:</p>
+                    <div class="row" id="quickTimeSlots">
+                        <!-- Morning slots -->
+                        <div class="col-md-6">
+                            <h6>Morning</h6>
+                            <div class="btn-group-vertical d-grid gap-1 mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="08:00">8:00 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="08:30">8:30 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="09:00">9:00 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="09:30">9:30 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="10:00">10:00 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="10:30">10:30 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="11:00">11:00 AM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="11:30">11:30 AM</button>
+                            </div>
+                        </div>
+                        <!-- Afternoon slots -->
+                        <div class="col-md-6">
+                            <h6>Afternoon</h6>
+                            <div class="btn-group-vertical d-grid gap-1 mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="13:00">1:00 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="13:30">1:30 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="14:00">2:00 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="14:30">2:30 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="15:00">3:00 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="15:30">3:30 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="16:00">4:00 PM</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm time-slot" data-time="16:30">4:30 PM</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .card-header {
+        background-color: #F6EFEF;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        color: #B28989;
+    }
+
+    .time-slot:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+    }
+
+    .time-slot.selected {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    h3{
+        color: #B28989;
+    }
+    .form-label{
+        color: #B28989           
+    }
+    .col-md-6{
+        color: #B28989;
+    }
+    .btn-button{
+        background-color: #B28989;
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const eventDateInput = document.getElementById('eventDate');
+        const eventTimeInput = document.getElementById('eventTime');
+        const conflictWarning = document.getElementById('conflictWarning');
+        const timeSlotButtons = document.querySelectorAll('.time-slot');
+
+        // Handle quick time slot selection
+        timeSlotButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const timeValue = this.getAttribute('data-time');
+                eventTimeInput.value = timeValue;
+
+                // Update button states
+                timeSlotButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+
+                checkTimeConflict();
+            });
+        });
+
+        // Check for time conflicts when date or time changes
+        eventDateInput.addEventListener('change', checkTimeConflict);
+        eventTimeInput.addEventListener('change', function() {
+            updateSelectedTimeSlot();
+            checkTimeConflict();
+        });
+
+        function updateSelectedTimeSlot() {
+            const currentTime = eventTimeInput.value;
+            timeSlotButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.getAttribute('data-time') === currentTime) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function checkTimeConflict() {
+            const date = eventDateInput.value;
+            const time = eventTimeInput.value;
+
+            if (date && time) {
+                conflictWarning.classList.add('d-none');
+            }
+        }
+
+        // Initialize selected time slot on page load
+        updateSelectedTimeSlot();
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

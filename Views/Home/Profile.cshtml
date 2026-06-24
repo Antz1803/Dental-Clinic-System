@@ -1,0 +1,99 @@
+﻿@model DCAS.Models.Users
+
+@{
+    ViewData["Title"] = "Staff Profile";
+
+    // Helper to safely format strings
+    string FormatString(string value) => string.IsNullOrEmpty(value) ? "N/A" : value;
+
+    // Helper to convert byte[] image to Base64
+    string GetBase64Image(byte[] imageBytes)
+    {
+        if (imageBytes != null && imageBytes.Length > 0)
+        {
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(imageBytes)}";
+        }
+        return null;
+    }
+
+    var profileBase64 = GetBase64Image(Model.Profile);
+}
+
+<style>
+    .profile-image {
+        width: 140px;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #E5D9D9;
+        margin-bottom: 15px;
+    }
+
+    .profile-card {
+        border-radius: 12px;
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #B28989;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 5px;
+    }
+
+    .profile-detail p {
+        margin-bottom: 8px;
+    }
+
+    .text-primary {
+        color: #B28989 !important;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary">Staff Profile</h2>
+
+    <div class="card shadow-sm profile-card">
+        <!-- Profile Image + Name -->
+        <div class="text-center mb-4">
+            @if (!string.IsNullOrEmpty(profileBase64))
+            {
+                <img src="@profileBase64" alt="Profile Picture" class="profile-image">
+            }
+            else
+            {
+                <div class="bg-light d-flex align-items-center justify-content-center mx-auto profile-image" style="border: 2px dashed #ccc;">
+                    <i class="fas fa-user-circle fa-3x text-muted"></i>
+                </div>
+            }
+            <h4 class="mt-3">@FormatString(Model.Name)</h4>
+            <p class="text-muted">@FormatString(Model.Role)</p>
+        </div>
+
+        <!-- Details -->
+        <div class="row profile-detail">
+            <div class="col-md-6">
+                <div class="section-title">Professional Details</div>
+                <p><strong>Username:</strong> @FormatString(Model.Username)</p>
+                <p><strong>Job Title:</strong> @FormatString(Model.JobTitle)</p>
+                <p><strong>Work Status:</strong> @FormatString(Model.WorkStatus)</p>
+                <p><strong>Position:</strong> @FormatString(Model.Position)</p>
+                <p><strong>Specialization:</strong> @FormatString(Model.Specialization)</p>
+                <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+            </div>
+
+            <div class="col-md-6">
+                <div class="section-title">Personal Details</div>
+                <p><strong>Gender:</strong> @FormatString(Model.Gender)</p>
+                <p><strong>Nationality:</strong> @FormatString(Model.Nationality)</p>
+                <p><strong>Birth Date:</strong> @Model.BirthDate.ToShortDateString()</p>
+                <p><strong>Address:</strong> @FormatString(Model.Address)</p>
+                <p><strong>Email:</strong> @FormatString(Model.Email)</p>
+                <p><strong>Phone Number:</strong> @FormatString(Model.PhoneNumber)</p>
+            </div>
+        </div>
+    </div>
+</div>
