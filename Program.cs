@@ -5,7 +5,16 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DCASContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DCASContext") ?? throw new InvalidOperationException("Connection string 'DCASContext' not found.")));
+{
+    var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DCASContext");
+    
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        connectionString = builder.Configuration.GetConnectionString("DCASContext");
+    }
+    
+    options.UseNpgsql(connectionString ?? throw new InvalidOperationException("Connection string 'DCASContext' not found."));
+});
 
 // Add authentication services to the container.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
