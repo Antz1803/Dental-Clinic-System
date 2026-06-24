@@ -3,15 +3,11 @@ using DCAS.Models;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using System;
 using System.Diagnostics;
 using System.Security.Claims;
-using System.Security.Principal;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Threading.Tasks;
 
 namespace DCAS.Controllers
 {
@@ -19,15 +15,25 @@ namespace DCAS.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly DCASContext _context;
+        private readonly IWebHostEnvironment _env; // Added environment tracker
 
-        public HomeController(ILogger<HomeController> logger, DCASContext context)
+        // Inject IWebHostEnvironment here
+        public HomeController(ILogger<HomeController> logger, DCASContext context, IWebHostEnvironment env)
         {
             _logger = logger;
             _context = context;
+            _env = env; 
         }
 
         public void ExistingTable()
         {
+            // === ENV CHECK: ONLY run this raw T-SQL block if running locally ===
+            if (!_env.IsDevelopment())
+            {
+                // We are on Render (Production PostgreSQL) — exit early so it doesn't crash!
+                return;
+            }
+
             var tableCheckQueryOne = @"
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'PersonInfo')
     BEGIN
@@ -96,14 +102,14 @@ namespace DCAS.Controllers
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'MedicineInventory')
     BEGIN
          CREATE TABLE MedicineInventory (
-    Id INT PRIMARY KEY  identity(1,1),
-    MedicineName VARCHAR(255) NOT NULL,
-    Price Decimal(10,2) not null,
-    Quantity INT NOT NULL,
-    Miligram Nvarchar(Max),
-    Description Nvarchar(Max),
-    ExpiryDate DATE NOT NULL,
-Image VARBINARY(MAX) 
+        Id INT PRIMARY KEY  identity(1,1),
+        MedicineName VARCHAR(255) NOT NULL,
+        Price Decimal(10,2) not null,
+        Quantity INT NOT NULL,
+        Miligram Nvarchar(Max),
+        Description Nvarchar(Max),
+        ExpiryDate DATE NOT NULL,
+    Image VARBINARY(MAX) 
         );
     END";
             _context.Database.ExecuteSqlRaw(tableCheckQueryMedicineInventory);
@@ -149,11 +155,11 @@ Image VARBINARY(MAX)
     PaymentDate DATE,                     
     PersonInfoId INT,                         
     ServicesId INT,                           
-                           
+                                              
 
 
     FOREIGN KEY(PersonInfoId) REFERENCES PersonInfo(Id),  
-    FOREIGN KEY(ServicesId) REFERENCES Services(Id),      );
+    FOREIGN KEY(ServicesId) REFERENCES Services(Id)      );
     END";
             _context.Database.ExecuteSqlRaw(tableCheckQueryPayment);
 
@@ -163,16 +169,14 @@ Image VARBINARY(MAX)
     CREATE TABLE PaymentMedicine (
     PaymentMedicineId INT PRIMARY KEY IDENTITY,
     PaymentId INT NOT NULL,
-MedicineName       NVARCHAR(max) not null,
+    MedicineName       NVARCHAR(max) not null,
     Price DECIMAL(10, 2),
-    
-    FOREIGN KEY(PaymentId) REFERENCES Payments(PaymentId),
-);
+        
+    FOREIGN KEY(PaymentId) REFERENCES Payments(PaymentId)
+    );
     END";
             _context.Database.ExecuteSqlRaw(tableCheckQueryPaymentMedicine);
         }
-
-
 
         [Authorize(Roles = "Admin,Staff")]
         public IActionResult Index()
@@ -181,12 +185,9 @@ MedicineName       NVARCHAR(max) not null,
             return View();
         }
 
-
-
         [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Profile()
         {
-            // 1. Get the current user's username from the claims.
             var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
 
             if (string.IsNullOrEmpty(username))
@@ -194,20 +195,17 @@ MedicineName       NVARCHAR(max) not null,
                 return Forbid();
             }
 
-            // 2. Find the user in the database using the Username (case-insensitive fix).
             var currentUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
 
             if (currentUser == null)
             {
-                // If the user's username is in the claim but not the database.
                 return NotFound();
             }
 
-            // 3. Return the view with the user data.
-            // This tells ASP.NET to look for Views/Home/Profile.cshtml
             return View("Profile", currentUser);
         }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
