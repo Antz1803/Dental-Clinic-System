@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using DCAS.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DCASContext>(options =>
 {
@@ -39,7 +41,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// IMPORTANT: The order matters. UseAuthentication must be before UseAuthorization.
 app.UseAuthentication();
 app.UseAuthorization();
 
