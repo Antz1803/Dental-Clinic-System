@@ -48,7 +48,7 @@ namespace DCAS.Controllers
                 var adminUser = new Users
                 {
                     Username = "admin",
-                    Password = BCrypt.Net.BCrypt.HashPassword("admin123", workFactor: 17),
+                    Password = BCrypt.Net.BCrypt.HashPassword("admin123", workFactor: 10),
                     Profile = profileData, // Assign the converted byte array
                     Name = "Administrator",
                     Role = "Admin",
